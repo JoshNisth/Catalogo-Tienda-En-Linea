@@ -1,20 +1,11 @@
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import java.awt.Color;
-import javax.swing.JLabel;
 import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import javax.swing.JButton;
-import javax.swing.JSeparator;
-import javax.swing.ImageIcon;
+import java.awt.event.*;
+import java.util.List;
 
 public class VentanaUsuario extends JFrame {
 
@@ -26,6 +17,7 @@ public class VentanaUsuario extends JFrame {
 	private JTextField txtIngreseSuUsuario;
 	private JPasswordField passwordField;
 	private JTextField textIncorrecto;
+	private int xOffset, yOffset;
 	/**
 	 * Launch the application.
 	 */
@@ -68,10 +60,27 @@ public class VentanaUsuario extends JFrame {
 		registro.agregarProducto(27,"Tableta Blanca Breick", "100.4 g", 18.7, 15, 30);
 		registro.agregarProducto(28,"Papitas Pringles", "149 g", 21.0, 18, 20);
 
+		List<Integer> l = registro.obtenerTodosLosIDs();
+		NotificacionesAlertas na = new NotificacionesAlertas();
+		for (Producto p:registro.obtenerProductos(l)){
+			if (p.getDisponibilidad() == 0) {
+				Notificacion notificacionAgotado = new Notificacion("Producto agotado: " + p.getNombre(), 0);
+				na.agregarNotificacion(notificacionAgotado);
+			}
+
+			// Agregar notificación de oferta especial
+			// Supongamos que solo notificamos si hay menos de 10 unidades disponibles
+			if (p.getDisponibilidad() < 5) {
+				Notificacion notificacionOferta = new Notificacion("Oferta especial: " + p.getNombre(), 1);
+				na.agregarNotificacion(notificacionOferta);
+			}
+
+		}
+
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VentanaUsuario frame = new VentanaUsuario(registro);
+					VentanaUsuario frame = new VentanaUsuario(registro, na);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -84,19 +93,76 @@ public class VentanaUsuario extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VentanaUsuario(RegistroProductos registro) {
+	public VentanaUsuario(RegistroProductos registro, NotificacionesAlertas na) {
 		setTitle("Inicio de Sesión");
 		setFont(new Font("Roboto Light", Font.BOLD, 28));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(450, 150, 640, 486);
+		setBounds(450, 150, 620, 486);
 		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-
-
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
+		setUndecorated(true);
+		setLocationByPlatform(true);
+		setBounds(100, 100, 620, 448); // Adjust as needed
+
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JPanel titleBarPanel = new JPanel();
+		titleBarPanel.setBackground(new Color(18, 55, 107));
+		titleBarPanel.setBounds(0, 0, 620, 20);
+		titleBarPanel.setLayout(null);
+
+		titleBarPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				xOffset = e.getX();
+				yOffset = e.getY();
+			}
+		});
+		titleBarPanel.addMouseMotionListener(new MouseAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				setLocation(e.getXOnScreen() - xOffset, e.getYOnScreen() - yOffset);
+			}
+		});
+
+		JPanel closeButtonPanel = new JPanel();
+		closeButtonPanel.setBackground(new Color(22, 45, 78));
+		closeButtonPanel.setBounds(600, 0, 20, 20);
+		closeButtonPanel.setLayout(null);
+
+		JLabel closeLabel = new JLabel("X");
+		closeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		closeLabel.setForeground(Color.WHITE);
+		closeLabel.setBounds(0, 0, 20, 20);
+		closeLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		closeLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				dispose();
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				closeButtonPanel.setBackground(new Color(191, 64, 53));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				closeButtonPanel.setBackground(new Color(22, 45, 78));
+			}
+		});
+
+		closeButtonPanel.add(closeLabel);
+		titleBarPanel.add(closeButtonPanel);
+		contentPane.add(titleBarPanel);
 
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(255, 255, 255));
@@ -158,7 +224,6 @@ public class VentanaUsuario extends JFrame {
 		panel.add(txtIngreseSuUsuario);
 		getContentPane().add(panel);
 
-
 		JLabel lblContraseña = new JLabel("Contraseña");
 		lblContraseña.setFont(new Font("Roboto Light", Font.BOLD, 20));
 		lblContraseña.setBounds(44, 224, 151, 19);
@@ -171,33 +236,11 @@ public class VentanaUsuario extends JFrame {
 		passwordField.setForeground(new Color(192, 192, 192));
 		panel.add(passwordField);
 
-		JButton btnIngresar = new JButton("Ingresar");
+		RoundButton btnIngresar = new RoundButton("Ingresar");
 		btnIngresar.setForeground(new Color(255, 255, 255));
-		btnIngresar.setBackground(new Color(11, 50, 79));
 		btnIngresar.setFont(new Font("Roboto Light", Font.BOLD, 15));
 		btnIngresar.setBounds(88, 336, 114, 43);
 		panel.add(btnIngresar);
-
-		/*
-		//En esta parte se valida la info de tu usuario y contraseña
-		btnIngresar.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        String usuario = txtIngreseSuUsuario.getText();
-		        String contraseña = new String(passwordField.getPassword());
-
-		        if (ManejoRegistros.validarUsuarioContraseña(usuario, contraseña)) {
-		            // Usuario y contraseña válidos, abrir VentanaCatalogo
-		            VentanaCatalogo ventanaCatalogo = new VentanaCatalogo();
-		            ventanaCatalogo.setVisible(true);
-
-		            // Cerrar la ventana actual de inicio de sesión
-		            dispose();
-		        } else {
-		            // Error, usuario y contraseña no validos
-		            System.out.println("Usuario o contraseña incorrectos");
-		        }
-		    }
-		});*/
 
 		btnIngresar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -206,7 +249,7 @@ public class VentanaUsuario extends JFrame {
 
 				if (ManejoRegistros.validarUsuarioContraseña(usuario, contraseña)) {
 					// Usuario y contraseña válidos, abrir VentanaCatalogo
-					VentanaCatalogo ventanaCatalogo = new VentanaCatalogo(registro, registro.obtenerTodosLosIDs());
+					VentanaCatalogo ventanaCatalogo = new VentanaCatalogo(registro, registro.obtenerTodosLosIDs(), na,usuario);
 					ventanaCatalogo.setVisible(true);
 
 					// Cerrar la ventana actual de inicio de sesión
@@ -254,11 +297,11 @@ public class VentanaUsuario extends JFrame {
 		separatorContrasena.setBounds(44, 292, 205, 2);
 		panel.add(separatorContrasena);
 
-		JButton btnRegistrar = new JButton("¿No tiene cuenta? Registrese");
+		JButton btnRegistrar = new JButton("¿No tiene cuenta? Regístrese");
 		btnRegistrar.setForeground(new Color(11, 50, 79));
-		btnRegistrar.setFont(new Font("Roboto Light", Font.BOLD, 15));
+		btnRegistrar.setFont(new Font("Roboto Light", Font.BOLD, 13));
 		btnRegistrar.setBackground(new Color(255, 255, 255));
-		btnRegistrar.setBounds(45, 390, 209, 43);
+		btnRegistrar.setBounds(38, 390, 215, 43);
 		panel.add(btnRegistrar);
 		// Establecer el borde del botón como null
 		btnRegistrar.setBorder(null);
@@ -306,22 +349,5 @@ public class VentanaUsuario extends JFrame {
 
 			public void mouseReleased(MouseEvent e) {}
 		});
-	
-	/*Esto también es de la pizzeria
-	btnIngresar.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-	        String usuario = txtIngreseSuUsuario.getText();
-	        String contraseña = new String(passwordField.getPassword());
-
-	        // Verificar el usuario y la contraseña
-	        if (usuario.equals("Progra2") && contraseña.equals("170209")) {
-	            // Usuario y contraseña son correctos, realizar acciones necesarias
-	            System.out.println("Ingreso exitoso");
-	        } else {
-	            // Usuario o contraseña son incorrectos, mostrar mensaje de error
-	            System.out.println("Usuario o contraseña incorrectos");
-	        }
-	    }
-	});*/
 	}
 }

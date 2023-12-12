@@ -1,19 +1,12 @@
-import java.awt.EventQueue;
+import java.awt.*;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import java.awt.Color;
-import javax.swing.JTextField;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JSeparator;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.ImageIcon;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class VentanaRegistro extends JFrame {
 
@@ -25,7 +18,7 @@ public class VentanaRegistro extends JFrame {
 	private JTextField textTelefono;
 	private JTextField textUsuario;
 	private JTextField textContrasena;
-
+	private int xOffset, yOffset;
 	/**
 	 * Launch the application.
 	 */
@@ -46,13 +39,72 @@ public class VentanaRegistro extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaRegistro() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(450, 150, 666, 436);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
+		setUndecorated(true);
+		setLocationByPlatform(true);
+		setBounds(100, 100, 620, 397);
+
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JPanel titleBarPanel = new JPanel();
+		titleBarPanel.setBackground(new Color(18, 55, 107));
+		titleBarPanel.setBounds(0, 0, 620, 20);
+		titleBarPanel.setLayout(null);
+
+		titleBarPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				xOffset = e.getX();
+				yOffset = e.getY();
+			}
+		});
+		titleBarPanel.addMouseMotionListener(new MouseAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				setLocation(e.getXOnScreen() - xOffset, e.getYOnScreen() - yOffset);
+			}
+		});
+
+		JPanel closeButtonPanel = new JPanel();
+		closeButtonPanel.setBackground(new Color(22, 45, 78));
+		closeButtonPanel.setBounds(600, 0, 20, 20);
+		closeButtonPanel.setLayout(null);
+
+		JLabel closeLabel = new JLabel("X");
+		closeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		closeLabel.setForeground(Color.WHITE);
+		closeLabel.setBounds(0, 0, 20, 20);
+		closeLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		closeLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				dispose();
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				closeButtonPanel.setBackground(new Color(191, 64, 53));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				closeButtonPanel.setBackground(new Color(22, 45, 78));
+			}
+		});
+
+		closeButtonPanel.add(closeLabel);
+		titleBarPanel.add(closeButtonPanel);
+		contentPane.add(titleBarPanel);
 
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(255, 255, 255));
@@ -75,13 +127,13 @@ public class VentanaRegistro extends JFrame {
 		textDireccion = new JTextField(10);
 		textDireccion.setFont(new Font("Roboto", Font.PLAIN, 15));
 		textDireccion.setBorder(null);
-		textDireccion.setBounds(475, 176, 140, 18);
+		textDireccion.setBounds(455, 176, 140, 18);
 		panel.add(textDireccion);
 
 		textTelefono = new JTextField(10);
 		textTelefono.setFont(new Font("Roboto", Font.PLAIN, 15));
 		textTelefono.setBorder(null);
-		textTelefono.setBounds(475, 256, 140, 18);
+		textTelefono.setBounds(455, 256, 140, 18);
 		panel.add(textTelefono);
 
 		JSeparator separatorNombre = new JSeparator();
@@ -102,7 +154,7 @@ public class VentanaRegistro extends JFrame {
 
 		JSeparator separatorUbicacion = new JSeparator();
 		separatorUbicacion.setForeground(Color.BLACK);
-		separatorUbicacion.setBounds(475, 284, 140, 2);
+		separatorUbicacion.setBounds(455, 284, 140, 2);
 		panel.add(separatorUbicacion);
 
 		JLabel lblNombre = new JLabel("Nombre:");
@@ -117,19 +169,18 @@ public class VentanaRegistro extends JFrame {
 
 		JLabel lblTelefono = new JLabel("Teléfono:");
 		lblTelefono.setFont(new Font("Roboto Light", Font.BOLD, 19));
-		lblTelefono.setBounds(348, 231, 102, 64);
+		lblTelefono.setBounds(328, 231, 102, 64);
 		panel.add(lblTelefono);
 
 		JLabel lblDireccion = new JLabel("Dirección:");
 		lblDireccion.setFont(new Font("Roboto Light", Font.BOLD, 19));
-		lblDireccion.setBounds(348, 156, 114, 72);
+		lblDireccion.setBounds(328, 156, 114, 72);
 		panel.add(lblDireccion);
 
-		JButton btnRegistrar = new JButton("Registrar");
+		RoundButton btnRegistrar = new RoundButton("Registrar");
 		btnRegistrar.setForeground(new Color(255, 255, 255));
 		btnRegistrar.setFont(new Font("Roboto Light", Font.BOLD, 15));
-		btnRegistrar.setBackground(new Color(11, 50, 79));
-		btnRegistrar.setBounds(479, 325, 136, 56);
+		btnRegistrar.setBounds(459, 325, 136, 56);
 		panel.add(btnRegistrar);
 
 		//Aqui se agrega la info al HashMap
@@ -154,7 +205,7 @@ public class VentanaRegistro extends JFrame {
 
 		JLabel lblContrasea = new JLabel("Contraseña: ");
 		lblContrasea.setFont(new Font("Roboto Light", Font.BOLD, 19));
-		lblContrasea.setBounds(348, 87, 136, 56);
+		lblContrasea.setBounds(328, 87, 136, 56);
 		panel.add(lblContrasea);
 
 		textUsuario = new JTextField(10);
@@ -166,29 +217,29 @@ public class VentanaRegistro extends JFrame {
 		textContrasena = new JTextField(10);
 		textContrasena.setFont(new Font("Roboto", Font.PLAIN, 15));
 		textContrasena.setBorder(null);
-		textContrasena.setBounds(475, 108, 140, 18);
+		textContrasena.setBounds(455, 108, 140, 18);
 		panel.add(textContrasena);
 
 		JSeparator separatorNombre_1 = new JSeparator();
 		separatorNombre_1.setForeground(Color.BLACK);
 		separatorNombre_1.setBackground(Color.LIGHT_GRAY);
-		separatorNombre_1.setBounds(475, 136, 140, 2);
+		separatorNombre_1.setBounds(455, 136, 140, 2);
 		panel.add(separatorNombre_1);
 
 		JSeparator separatorNombre_2 = new JSeparator();
 		separatorNombre_2.setForeground(Color.BLACK);
 		separatorNombre_2.setBackground(Color.LIGHT_GRAY);
-		separatorNombre_2.setBounds(475, 205, 140, 2);
+		separatorNombre_2.setBounds(455, 205, 140, 2);
 		panel.add(separatorNombre_2);
 
 		JLabel lblRegistrarDatos = new JLabel("REGISTRAR DATOS");
 		lblRegistrarDatos.setFont(new Font("Roboto", Font.BOLD, 25));
-		lblRegistrarDatos.setBounds(202, 26, 219, 43);
+		lblRegistrarDatos.setBounds(195, 26, 240, 43);
 		panel.add(lblRegistrarDatos);
 
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setIcon(new ImageIcon(VentanaUsuario.class.getResource("/CatalogoFotos/carroPrueba.png")));
-		lblNewLabel.setBounds(358, 306, 92, 77);
+		lblNewLabel.setBounds(348, 306, 92, 77);
 		panel.add(lblNewLabel);
 	}
 }

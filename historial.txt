@@ -1,0 +1,4 @@
+Luwu:Tableta Blanca Breick,1,18.7,2023/12/10;
+Luwu:Agua Vital sin Gas,1,7.6,2023/12/10;
+Preta:Papitas Pringles,2,42.0,2023/12/11;
+Lusilu:Pollo Entero,1,39.0,2023/12/11;

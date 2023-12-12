@@ -1,9 +1,13 @@
+import java.awt.*;
 import java.io.*;
+import java.util.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ManejoRegistros {
     //ubicacion a preferencia del usuario
-	private static final String FILE_PATH = "C:\\Users\\JOSH13\\Downloads\\FiniticadoCatalogoTiendaEnLinea\\usuarios.txt";
+	private static final String FILE_PATH = "D:\\SEM-4\\ESTRUCTURA DE DATOS\\PRODUCTOS PROYECTO\\CATALOGO\\FiniticadoCatalogoTiendaEnLinea\\FiniticadoCatalogoTiendaEnLinea\\usuarios.txt";
     private static HashMap<String, String> registros = new HashMap<>();
 
     static {
@@ -43,5 +47,13 @@ public class ManejoRegistros {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<String> obtenerNombresDeUsuario() {
+        List<String> nombresDeUsuario = new ArrayList<>();
+        for (String usuario : registros.keySet()) {
+            nombresDeUsuario.add(usuario);
+        }
+        return nombresDeUsuario;
     }
 }

@@ -36,7 +36,7 @@ public class NotificacionesAlertas {
 
         // Agregar notificación de oferta especial
         // Supongamos que solo notificamos si hay menos de 10 unidades disponibles
-        if (producto2.getDisponibilidad() < 10) {
+        if (producto2.getDisponibilidad() < 5) {
             Notificacion notificacionOferta = new Notificacion("Oferta especial: " + producto2.getNombre(), 1);
             agregarNotificacion(notificacionOferta);
         }
